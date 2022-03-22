@@ -38,7 +38,7 @@ describe("Testing get characters", () => {
         })
     })   
 
-    it("Test get characters - deads", () => { 
+    it("Test GET characters - deads", () => { 
         var array = 
                 cy.request({
                     method: 'GET',
@@ -177,7 +177,7 @@ describe("Testing get characters", () => {
         
     }); 
     
-    it.only("Test POST employees with arrays", () =>{
+    it("Test POST employees with arrays", () =>{
         cy.wait(2000)
         cy.request({
             method: 'POST',
