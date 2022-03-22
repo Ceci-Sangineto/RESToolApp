@@ -1,17 +1,5 @@
 describe("Testing get characters", () => {
 
-    beforeEach("Obteniendo el id de los empleados", () => {
-        let idArray = []
-        cy.visit("https://dsternlicht.github.io/RESTool/#/employees?search=&page=1&limit=300")
-            cy.wait(5000)                                                
-            cy.get('#root > div > div.app-page > main > div > table > tbody > tr > td:nth-child(1) > span').each(($el, index, $lis) => {              
-                cy.wrap($el).then((val) => {
-                    idArray.push(val.text());
-                    cy.log(idArray[index])               
-                })
-            })
-    })
-
     it("Test GET characters - extras", () => { 
         var array = 
                 cy.request({
@@ -176,21 +164,4 @@ describe("Testing get characters", () => {
 
         
     }); 
-    
-    it("Test POST employees with arrays", () =>{
-        cy.wait(2000)
-        cy.request({
-            method: 'POST',
-            url: 'https://restool-sample-app.herokuapp.com/api/employee',
-            form:true,
-            body:{
-                id: "IDCecilia",
-                name: "Ceci",
-                jobTitle: "Tester intern",
-                isFired: false
-            }           
-        }).then(async(response) => { 
-            await expect(response.status).to.eq(200)
-        })
-    });
 })
