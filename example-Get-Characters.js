@@ -53,7 +53,7 @@ describe("Testing get characters", () => {
         })
     })   
 
-    it("Test POST new character", () => { 
+    it("Test POST PUT AND DELETE new character", () => { 
         const uniqueSeed = Date.now().toString();
         cy.request({
             method: 'POST',
@@ -80,47 +80,51 @@ describe("Testing get characters", () => {
                     return
                 }                                 
             }).then(($lis) => {
+                expect($lis).to.have.length.greaterThan(1)          
+            })
+            
+            cy.request({
+            method: 'PUT',
+            url: 'https://restool-sample-app.herokuapp.com/api/character/'+response.body.id,
+            form:true,
+            body:{
+                "name": "Ceciliaaa",
+                "realName": "Ceciliaaa",
+                "isAlive" : true,
+                "location": "Buenos Aires",
+            }           
+            }).then(async(response) => { 
+            await expect(response.status).to.eq(200)            
+            cy.visit("https://dsternlicht.github.io/RESTool/#/characters?search=")                                                 
+            cy.get('#root > div > div.app-page > main > div > div > div > div:nth-child(2) > span').each(($el, index, $lis) => {
+                cy.log($el.text())               
+                if ($el.text() == "Ceciliaaa") {
+                    cy.log('Element found')
+                    return
+                }     
+              }).then(($lis) => {
                 expect($lis).to.have.length.greaterThan(1)             
-            })        
-            cy.wait(5000)    
+              })
+            });       
+    
             cy.request({
                 method: 'DELETE',
                 url: 'https://restool-sample-app.herokuapp.com/api/character/'+response.body.id            
             }).then((response) => { 
-                expect(response.status).to.eq(200)        
-                })   
-                        
+                expect(response.status).to.eq(200)
+                cy.reload()
+                cy.get('#root > div > div.app-page > main > div > div > div > div:nth-child(2) > span').each(($el, index, $lis) => {              
+                    if ($el.text() == response.body.id) {
+                        cy.log('item not removed successfully')
+                        return
+                    }
+                })
+                cy.log("Item removed successfully")
+            })      
         });       
     })
 
-    it("Test PUT new character", () => {
-        const newName = "Ceciliaaa"
-        cy.request({
-            method: 'PUT',
-            url: 'https://restool-sample-app.herokuapp.com/api/character/K6nfafIiGbVM',
-            form:true,
-            body:{
-                "name": newName,
-                "isAlive" : true,
-                "location": "Buenos Aires",
-            }           
-        }).then(async(response) => { 
-            await expect(response.status).to.eq(200)            
-            cy.visit("https://dsternlicht.github.io/RESTool/#/characters?search=")
-            cy.wait(5000)                                                 
-            cy.get('#root > div > div.app-page > main > div > div > div > div:nth-child(3) > span').each(($el, index, $lis) => {
-                cy.log($el.text())               
-                if ($el.text() == newName) {
-                    cy.log('Element found')
-                    return
-                }     
-            }).then(($lis) => {
-                expect($lis).to.have.length.greaterThan(1)             
-            })
-        });       
-    })
-
-    it("Test POST employees", () =>{
+    it("Test POST AND DELETE employees", () =>{
         cy.wait(2000)
         cy.request({
             method: 'POST',
@@ -149,7 +153,6 @@ describe("Testing get characters", () => {
                 url: 'https://restool-sample-app.herokuapp.com/api/employee/'+response.body.id            
             }).then(async(response) => { 
                 expect(response.status).to.eq(200)
-                cy.reload()
                 cy.get('#root > div > div.app-page > main > div > table > tbody > tr > td:nth-child(1) > span').each(($el, index, $lis) => {              
                     if ($el.text() == response.body.id) {
                         cy.log('item not removed successfully')
@@ -157,6 +160,7 @@ describe("Testing get characters", () => {
                     }
                 })
                 cy.log("Item removed successfully")
+                cy.reload()
                 
             })
 
@@ -164,4 +168,5 @@ describe("Testing get characters", () => {
 
         
     }); 
+
 })
