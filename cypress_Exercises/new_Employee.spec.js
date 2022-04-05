@@ -1,6 +1,6 @@
 describe("Testing get characters", () => {
 
-    it("Test POST AND DELETE employees", () =>{
+    it("Test POST & DELETE employees", () =>{
         cy.wait(2000)
         cy.request({
             method: 'POST',

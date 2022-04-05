@@ -1,5 +1,5 @@
 describe("Testing get characters", () => {
-    it("Test POST PUT and DELETE character", () => { 
+    it("Test POST & PUT & DELETE character", () => { 
         const uniqueSeed = Date.now().toString();
         cy.request({
             method: 'POST',
