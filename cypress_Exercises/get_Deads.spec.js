@@ -1,6 +1,6 @@
-describe("Testing get characters", () => {
+describe("Test DEADS", () => {
 
-    it("Test GET Deads", () => { 
+    it("Test GET", () => { 
         var array = 
                 cy.request({
                     method: 'GET',
