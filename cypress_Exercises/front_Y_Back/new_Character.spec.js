@@ -7,38 +7,39 @@ describe("Test Characters", () => {
     let post_response
     let put_response
     let delete_response
+    let pageObject = new pageObjects();
 
-    it("Test GET", () => { 
-        var array = 
-                cy.request({
-                    method: 'GET',
-                    url: 'https://restool-sample-app.herokuapp.com/api/character',
-                    form:true           
-                }).then((response) => { 
-                    expect(response.status).to.eq(200)
-                    expect(response.body.items.name).to.not.be.null
-                    return response.body.items.id
-                });
+    it("Test GET", () => {
+        var array =
+            cy.request({
+                method: 'GET',
+                url: 'https://restool-sample-app.herokuapp.com/api/character',
+                form: true
+            }).then((response) => {
+                expect(response.status).to.eq(200)
+                expect(response.body.items.name).to.not.be.null
+                return response.body.items.id
+            });
 
         cy.visit("https://dsternlicht.github.io/RESTool/#/characters?search=")
-        cy.get("#root > div > div.app-page > main > div > div > div > div:nth-child(2) > span").should('have.length.greaterThan',0)
-        cy.get("#root > div > div.app-page > main > div > div > div > div:nth-child(2) > span").each(($el, index, $lis) => {   
-            
+        cy.get("#root > div > div.app-page > main > div > div > div > div:nth-child(2) > span").should('have.length.greaterThan', 0)
+        cy.get("#root > div > div.app-page > main > div > div > div > div:nth-child(2) > span").each(($el, index, $lis) => {
+
             cy.wrap($el).then((val) => {
-                for( let i=0; i < array.lenght; i++){
-                    if ($lis.not.includes(array[i])){
+                for (let i = 0; i < array.lenght; i++) {
+                    if ($lis.not.includes(array[i])) {
                         idArray.push(array[i])
                         control_var = false
                     }
                 }
-            }). then(($lis) => {
+            }).then(($lis) => {
                 expect($lis).to.have.length.of.at.least(1)
                 expect(control_var).to.be.eq(true)
             })
         })
     })
 
-    it.skip("Test POST", () => {
+    it("Test POST", () => {
 
         let isAlive = false
         let location = "Beyond the wall"
@@ -49,21 +50,21 @@ describe("Test Characters", () => {
         cy.request({
             method: 'POST',
             url: 'https://restool-sample-app.herokuapp.com/api/character',
-            form:true,
-            body:{
-                id:uniqueSeed,
+            form: true,
+            body: {
+                id: uniqueSeed,
                 isAlive: isAlive,
                 location: location,
                 name: name,
                 realName: real_name,
                 thumbnail: thumbnail
-            }           
-        }).then(async(response) => {
+            }
+        }).then(async (response) => {
             post_response = response
-            await expect(response.status).to.eq(200)            
+            await expect(response.status).to.eq(200)
             expect(response.body.realName).to.be.eq("Cecilia")
 
-            cy.viewport(1440,860);
+            cy.viewport(1440, 860);
             cy.visit("https://dsternlicht.github.io/RESTool/#/characters?search=")
 
             cy.scrollTo('bottom')
@@ -74,20 +75,20 @@ describe("Test Characters", () => {
             cy.wait(4000)
             cy.scrollTo('bottom')
 
-            cy.get('#root > div > div.app-page > main > div > div > div> div:nth-child(2) > span').should('have.length.greaterThan',0) // Preguntar Pancho                                                   
-            cy.get('#root > div > div.app-page > main > div > div > div> div:nth-child(2) > span').each(($el, index, $lis) => { 
+            cy.get('#root > div > div.app-page > main > div > div > div> div:nth-child(2) > span').should('have.length.greaterThan', 0) // Preguntar Pancho                                                   
+            cy.get('#root > div > div.app-page > main > div > div > div> div:nth-child(2) > span').each(($el, index, $lis) => {
                 cy.log($el.text())
                 if ($el.text() == response.body.id) {
                     cy.log("Element found")
                     return;
-                }                                 
+                }
             }).then(($lis) => {
-                expect($lis).to.have.length.greaterThan(1)          
+                expect($lis).to.have.length.greaterThan(1)
             })
         })
     })
 
-    it ("Test PUT", () => {
+    it("Test PUT", () => {
 
         let new_name = "Cecilia Sangineto Ruibal"
         let new_real_name = "Maria Cecilia Sangineto Ruibal"
@@ -95,35 +96,27 @@ describe("Test Characters", () => {
         let new_location = "Buenos Aires"
 
         cy.request({
-        method: 'PUT',
-        url: 'https://restool-sample-app.herokuapp.com/api/character/' + uniqueSeed,
-        body:{
+            method: 'PUT',
+            url: 'https://restool-sample-app.herokuapp.com/api/character/' + uniqueSeed,
+            body: {
                 name: new_name,
                 realName: new_real_name,
-                isAlive : new_isAlive,
+                isAlive: new_isAlive,
                 location: new_location,
-        }           
-        }).then(async(response) => {
-        await expect(response.status).to.eq(200)
+            }
+        }).then(async (response) => {
+            await expect(response.status).to.eq(200)
+            expect(response.body).to.not.be.null
+            let validation = pageObject.get_card(response.body.id)
+            //expect(validation.realName).to.be.eq(response.body.realName)
         })
-
-        const idArray = []
-        cy.visit("https://dsternlicht.github.io/RESTool/#/characters?search=")                                                 
-        cy.get('#root > div > div.app-page > main > div > div > div> div:nth-child(4) > span').each(($el, index, $lis) => {              
-            cy.wrap($el).then((val) => {
-                if (val.text() == response.body.realName){
-                    idArray.push(val.text());
-                }                
-            })
-        })
-            expect(idArray).to.have.length(1)
     })
 
     it("Test DELETE", () => {
         cy.request({
             method: 'DELETE',
-            url: 'https://restool-sample-app.herokuapp.com/api/character/'+uniqueSeed,       
-        }).then(async(response) => {
+            url: 'https://restool-sample-app.herokuapp.com/api/character/' + uniqueSeed,
+        }).then(async (response) => {
             await expect(response.status).to.eq(200)
             cy.reload()
             cy.scrollTo('bottom')
@@ -135,7 +128,7 @@ describe("Test Characters", () => {
                 }                                 
             }).then((lis) => {
                 expect(lis).to.have.length.lessThan(1)*/
-        
+
         })
     })
 })
