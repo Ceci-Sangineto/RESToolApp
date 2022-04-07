@@ -110,12 +110,12 @@ describe("Test Characters", function () {
             // pageObject.get_card(uniqueSeed)
 
             cy.get_card(uniqueSeed).then((character) => {
-                 expect(character.name).to.deep.equal(new_name)
-                 expect(character.realName).to.deep.equal(new_real_name)
-                 expect(character.isAlive).to.deep.equal(new_isAlive)
-                 expect(character.location).to.deep.equal(new_location)
-                 cy.log(character)
-             })
+                expect(character.name).to.deep.equal(new_name)
+                expect(character.realName).to.deep.equal(new_real_name)
+                expect(character.isAlive).to.deep.equal(new_isAlive)
+                expect(character.location).to.deep.equal(new_location)
+                cy.log(character)
+            })
         })
     })
 
@@ -128,13 +128,39 @@ describe("Test Characters", function () {
             cy.reload()
             cy.scrollTo('bottom')
 
-            /*cy.get('#root > div > div.app-page > main > div > div > div> div:nth-child(2) > span').each((el, index, lis) => {          
-                if (el.text() == uniqueSeed) {
-                    cy.log($el.text)
-                    lis.push($el.text());
-                }                                 
-            }).then((lis) => {
-                expect(lis).to.have.length.lessThan(1)*/
+        var array =
+            cy.request({
+                method: 'GET',
+                url: 'https://restool-sample-app.herokuapp.com/api/character',
+                form: true
+            }).then((response) => {
+                expect(response.status).to.eq(200)
+                expect(response.body.items.name).to.not.be.null
+                return response.body.items.id
+        });
+
+        var idArray = []
+        cy.visit("https://dsternlicht.github.io/RESTool/#/characters?search=")
+
+        cy.scrollTo('bottom')
+            cy.wait(2000)
+            cy.scrollTo('bottom')
+            cy.wait(2000)
+            cy.scrollTo('bottom')
+            cy.wait(4000)
+            cy.scrollTo('bottom') 
+
+        
+        cy.get("#root > div > div.app-page > main > div > div > div > div:nth-child(2) > span").each(($el, index, $lis) => {
+        cy.wrap($el).then((val) => {
+                if ( val == A9dMcB6fBjWh ) {
+                    idArray.push(val)
+                }
+            })
+        })
+
+        expect(idArray).to.have.length(0)
+        //expect(array).to.not.includes(uniqueSeed)
 
         })
     })
