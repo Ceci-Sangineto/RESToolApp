@@ -1,6 +1,6 @@
 import pageObjects from '../pageObjects/pageObjects';
 
-describe("Test Characters", () => {
+describe("Test Characters", function () {
 
     const uniqueSeed = Date.now().toString()
     let control_var = true
@@ -106,9 +106,16 @@ describe("Test Characters", () => {
             }
         }).then(async (response) => {
             await expect(response.status).to.eq(200)
-            expect(response.body).to.not.be.null
-            let validation = pageObject.get_card(response.body.id)
-            //expect(validation.realName).to.be.eq(response.body.realName)
+
+            // pageObject.get_card(uniqueSeed)
+
+            cy.get_card(uniqueSeed).then((character) => {
+                 expect(character.name).to.deep.equal(new_name)
+                 expect(character.realName).to.deep.equal(new_real_name)
+                 expect(character.isAlive).to.deep.equal(new_isAlive)
+                 expect(character.location).to.deep.equal(new_location)
+                 cy.log(character)
+             })
         })
     })
 
