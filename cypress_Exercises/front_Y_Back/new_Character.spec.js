@@ -125,43 +125,42 @@ describe("Test Characters", function () {
             url: 'https://restool-sample-app.herokuapp.com/api/character/' + uniqueSeed,
         }).then(async (response) => {
             await expect(response.status).to.eq(200)
-            cy.reload()
-            cy.scrollTo('bottom')
+        })
 
-        var array =
-            cy.request({
-                method: 'GET',
-                url: 'https://restool-sample-app.herokuapp.com/api/character',
-                form: true
-            }).then((response) => {
-                expect(response.status).to.eq(200)
-                expect(response.body.items.name).to.not.be.null
-                return response.body.items.id
-        });
+        //checkeamos el back
 
-        var idArray = []
+        cy.reload()
+        cy.scrollTo('bottom')
+
+        cy.get_back_ids().then((array) => {
+            // cy.log(JSON.stringify(array))
+            const ids = Cypress._.chain(array).map('id').value()
+            // cy.log(ids)
+            // var numeros = [1 ,2 ,3]
+            // cy.log("El numero 2 esta contenido en el array? :" + numeros.includes(4));
+            expect(ids).not.includes(uniqueSeed)
+
+        })
+
+        //checkeamos el front
+
+        cy.viewport(1440, 860);
         cy.visit("https://dsternlicht.github.io/RESTool/#/characters?search=")
 
         cy.scrollTo('bottom')
-            cy.wait(2000)
-            cy.scrollTo('bottom')
-            cy.wait(2000)
-            cy.scrollTo('bottom')
-            cy.wait(4000)
-            cy.scrollTo('bottom') 
+        cy.wait(2000)
+        cy.scrollTo('bottom')
+        cy.wait(2000)
+        cy.scrollTo('bottom')
+        cy.wait(4000)
+        cy.scrollTo('bottom')
 
-        
-        cy.get("#root > div > div.app-page > main > div > div > div > div:nth-child(2) > span").each(($el, index, $lis) => {
-        cy.wrap($el).then((val) => {
-                if ( val == A9dMcB6fBjWh ) {
-                    idArray.push(val)
-                }
-            })
-        })
-
-        expect(idArray).to.have.length(0)
-        //expect(array).to.not.includes(uniqueSeed)
-
+        cy.get('main > div > div > div > div:nth-child(2) > span').then(($array) => {
+            // expect($array).not.includes(uniqueSeed)
+            const ids = Cypress._.chain($array).map( function(x) {
+                return x.innerText;
+             })
+            cy.log(ids[1])
         })
     })
 })
