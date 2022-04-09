@@ -9,32 +9,24 @@ describe("Test Characters", function () {
     let delete_response
     let pageObject = new pageObjects();
 
-    it("Test GET", () => {
-        var array =
-            cy.request({
-                method: 'GET',
-                url: 'https://restool-sample-app.herokuapp.com/api/character',
-                form: true
-            }).then((response) => {
-                expect(response.status).to.eq(200)
-                expect(response.body.items.name).to.not.be.null
-                return response.body.items.id
-            });
+    it.skip("Test GET", () => {
+        cy.get_back_ids().then((array_back) => {
+            const ids_back = Cypress._.chain(array_back).map('id').value()
 
-        cy.visit("https://dsternlicht.github.io/RESTool/#/characters?search=")
-        cy.get("#root > div > div.app-page > main > div > div > div > div:nth-child(2) > span").should('have.length.greaterThan', 0)
-        cy.get("#root > div > div.app-page > main > div > div > div > div:nth-child(2) > span").each(($el, index, $lis) => {
+            cy.viewport(1440, 860);
+            cy.visit("https://dsternlicht.github.io/RESTool/#/characters?search=")
 
-            cy.wrap($el).then((val) => {
-                for (let i = 0; i < array.lenght; i++) {
-                    if ($lis.not.includes(array[i])) {
-                        idArray.push(array[i])
-                        control_var = false
-                    }
-                }
-            }).then(($lis) => {
-                expect($lis).to.have.length.of.at.least(1)
-                expect(control_var).to.be.eq(true)
+            cy.get('main > div > div > div > div:nth-child(2) > span').then(($array_front) => {
+                const ids_front = Cypress._.map($array_front, 'innerText')
+
+                cy.get('#root > div > div.app-page > main > p').then(($elem) => {
+                    const myArray = $elem.text().split(" ")
+                   expect(ids_front.length).eq(myArray[1]) // Comparo que el numero de ids que dice la pagina sea igual al del front
+                })
+
+                cy.contains_the_same_elems(ids_back, ids_front).then((comparation) => {
+                    expect(comparation).to.eq(true)
+                })
             })
         })
     })
@@ -75,15 +67,17 @@ describe("Test Characters", function () {
             cy.wait(4000)
             cy.scrollTo('bottom')
 
-            cy.get('#root > div > div.app-page > main > div > div > div> div:nth-child(2) > span').should('have.length.greaterThan', 0) // Preguntar Pancho                                                   
-            cy.get('#root > div > div.app-page > main > div > div > div> div:nth-child(2) > span').each(($el, index, $lis) => {
-                cy.log($el.text())
-                if ($el.text() == response.body.id) {
-                    cy.log("Element found")
-                    return;
-                }
-            }).then(($lis) => {
-                expect($lis).to.have.length.greaterThan(1)
+            cy.get('#root > div > div.app-page > main > div > div > div> div:nth-child(2) > span').should('have.length.greaterThan', 0)
+            cy.get('#root > div > div.app-page > main > div > div > div> div:nth-child(2) > span').then(($array) => {
+
+                const ids = Cypress._.map($array, 'innerText')
+
+                cy.get('#root > div > div.app-page > main > p').then(($elem) => {
+                    const myArray = $elem.text().split(" ")
+                    expect(ids.length).eq(myArray[1]) // Falla porque en el front no cargan todas las cards
+                })
+
+                expect(ids).includes(uniqueSeed) // si falla el anterior este no se deberia correr
             })
         })
     })
@@ -156,11 +150,14 @@ describe("Test Characters", function () {
         cy.scrollTo('bottom')
 
         cy.get('main > div > div > div > div:nth-child(2) > span').then(($array) => {
-            // expect($array).not.includes(uniqueSeed)
-            const ids = Cypress._.chain($array).map( function(x) {
-                return x.innerText;
-             })
-            cy.log(ids[1])
+            const ids = Cypress._.map($array, 'innerText')
+
+            cy.get('#root > div > div.app-page > main > p').then(($elem) => {
+                const myArray = $elem.text().split(" ")
+                expect(ids.length).eq(myArray[1]) // Falla porque en el front no cargan todas las cards
+            })
+
+            expect(ids).not.includes(uniqueSeed) // si falla el anterior este no se deberia correr
         })
     })
 })
