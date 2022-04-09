@@ -10,7 +10,7 @@ describe("Test Characters", function () {
     let pageObject = new pageObjects();
 
     it.skip("Test GET", () => {
-        cy.get_back_ids().then((array_back) => {
+        cy.get_back_ids('https://restool-sample-app.herokuapp.com/api/character').then((array_back) => {
             const ids_back = Cypress._.chain(array_back).map('id').value()
 
             cy.viewport(1440, 860);
@@ -126,7 +126,7 @@ describe("Test Characters", function () {
         cy.reload()
         cy.scrollTo('bottom')
 
-        cy.get_back_ids().then((array) => {
+        cy.get_back_ids('https://restool-sample-app.herokuapp.com/api/character').then((array) => {
             // cy.log(JSON.stringify(array))
             const ids = Cypress._.chain(array).map('id').value()
             // cy.log(ids)
